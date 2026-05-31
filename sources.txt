@@ -1,0 +1,7 @@
+C:\Users\Isabel\OneDrive\Desktop\Logica\Final logica 2\src\controller\PredioController.java
+C:\Users\Isabel\OneDrive\Desktop\Logica\Final logica 2\src\main\Main.java
+C:\Users\Isabel\OneDrive\Desktop\Logica\Final logica 2\src\model\AlgoritmosOrdenamiento.java
+C:\Users\Isabel\OneDrive\Desktop\Logica\Final logica 2\src\model\BusquedaBinaria.java
+C:\Users\Isabel\OneDrive\Desktop\Logica\Final logica 2\src\model\CsvReader.java
+C:\Users\Isabel\OneDrive\Desktop\Logica\Final logica 2\src\model\Predio.java
+C:\Users\Isabel\OneDrive\Desktop\Logica\Final logica 2\src\view\PredioView.java
