@@ -62,7 +62,6 @@ public class PredioController {
                 List<Predio> result = CsvReader.leerCsv(ruta);
                 long endTime = System.nanoTime();
                 double tiempoMs = (endTime - startTime) / 1_000_000.0;
-                // Store time in a property accessible via getStateValue? We'll use a field.
                 this.tiempoMs = tiempoMs;
                 return result;
             }
@@ -124,7 +123,6 @@ public class PredioController {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             private double tiempoMs;
 
-            @Override
             protected Void doInBackground() throws Exception {
                 long inicio = System.nanoTime();
 
@@ -140,7 +138,6 @@ public class PredioController {
                 return null;
             }
 
-            @Override
             protected void done() {
                 actualizarTabla(predios);
                 vista.getLblCantidad().setText("Registros: " + predios.size());
@@ -178,7 +175,7 @@ public class PredioController {
             private double tiempoBusquedaMs;
             private double totalMs;
 
-            @Override
+        
             protected List<Predio> doInBackground() throws Exception {
                 List<Predio> datos = new ArrayList<>();
                 datos.addAll(prediosOriginales);
@@ -206,7 +203,7 @@ public class PredioController {
                 return resultados;
             }
 
-            @Override
+    
             protected void done() {
                 try {
                     List<Predio> resultados = get();
@@ -219,7 +216,6 @@ public class PredioController {
                         vista.getLblCantidad().setText("Registros encontrados: " + resultados.size());
                         vista.getLblEstado()
                                 .setText("Estado: Busqueda completada - " + resultados.size() + " coincidencias");
-                        // Seleccionar primera fila y destacar columna buscada
                         int colIndex = vista.getCbColumna().getSelectedIndex();
                         if (colIndex >= 0) {
                             vista.seleccionarFilaConColumna(0, colIndex);

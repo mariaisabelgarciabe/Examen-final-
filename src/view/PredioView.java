@@ -6,11 +6,7 @@ import java.awt.*;
 import java.io.File;
 import model.Predio;
 
-/**
- * Vista del sistema catastral.
- * Interfaz grafica construida con Java Swing (JFrame, JTable, JScrollPane,
- * JTextField, JComboBox, JButton, JLabel, JPanel, JOptionPane, JFileChooser).
- */
+
 public class PredioView extends JFrame {
     private DefaultTableModel tableModel;
     private JTable table;
@@ -27,9 +23,7 @@ public class PredioView extends JFrame {
 
     private final String[] columnas = {"NPN", "Municipio", "Direccion", "NumeroFicha"};
 
-    /**
-     * Constructor principal. Configura ventana y construye componentes.
-     */
+    
     public PredioView() {
         setTitle("Sistema Catastral - Antioquia");
         setSize(1000, 600);
@@ -38,13 +32,10 @@ public class PredioView extends JFrame {
         inicializarComponentes();
     }
 
-    /**
-     * Inicializa paneles, tabla y controles.
-     */
+    
     private void inicializarComponentes() {
         setLayout(new BorderLayout());
 
-        // Panel superior con controles
         JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
         JLabel lblBuscar = new JLabel("Buscar:");
         lblBuscar.setFont(new Font("SansSerif", Font.PLAIN, 16));
@@ -89,7 +80,6 @@ public class PredioView extends JFrame {
 
         add(panelSuperior, BorderLayout.NORTH);
 
-        // Tabla central con scroll
         tableModel = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -110,7 +100,7 @@ public class PredioView extends JFrame {
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Panel inferior
+        
         JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
         lblTiempo = new JLabel("Tiempo: N/A");
         lblTiempo.setFont(new Font("SansSerif", Font.PLAIN, 16));
@@ -130,7 +120,6 @@ public class PredioView extends JFrame {
         add(panelInferior, BorderLayout.SOUTH);
     }
 
-    // Getters para el controlador
     public JTextField getTxtBuscar() { return txtBuscar; }
     public JComboBox<String> getCbColumna() { return cbColumna; }
     public JComboBox<String> getCbAlgoritmo() { return cbAlgoritmo; }
@@ -143,11 +132,7 @@ public class PredioView extends JFrame {
     public JButton getBtnCargar() { return btnCargar; }
     public DefaultTableModel getTableModel() { return tableModel; }
 
-    /**
-     * Actualiza la tabla con la lista de predios.
-     *
-     * @param predios lista a mostrar.
-     */
+    
     public void actualizarTabla(java.util.List<Predio> predios) {
         tableModel.setRowCount(0);
         if (predios != null) {
@@ -162,19 +147,12 @@ public class PredioView extends JFrame {
         }
     }
 
-    /**
-     * Limpia la tabla.
-     */
+    
     public void limpiarTabla() {
         tableModel.setRowCount(0);
     }
 
-    /**
-     * Muestra mensaje al usuario.
-     *
-     * @param mensaje texto del mensaje.
-     * @param esError true para mostrar como error.
-     */
+    
     public void mostrarMensaje(String mensaje, boolean esError) {
         if (esError) {
             JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
@@ -183,11 +161,7 @@ public class PredioView extends JFrame {
         }
     }
 
-    /**
-     * Abre JFileChooser para seleccionar un archivo CSV.
-     *
-     * @return archivo seleccionado o null si se cancela.
-     */
+    
     public File seleccionarArchivoCsv() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Seleccionar archivo CSV de predios");
@@ -198,13 +172,7 @@ public class PredioView extends JFrame {
         return null;
     }
 
-    /**
-     * Selecciona una fila y se asegura de que sea visible.
-     * También destaca la columna especificada.
-     *
-     * @param rowIndex índice de fila a seleccionar
-     * @param colIndex índice de columna a destacar (puede ser -1 para no destacar columna)
-     */
+    
     public void seleccionarFilaConColumna(int rowIndex, int colIndex) {
         if (rowIndex < 0 || rowIndex >= table.getRowCount()) {
             return;
@@ -213,10 +181,10 @@ public class PredioView extends JFrame {
         if (colIndex >= 0 && colIndex < table.getColumnCount()) {
             table.setColumnSelectionInterval(colIndex, colIndex);
         } else {
-            // solo selección de fila
+            
             table.setColumnSelectionAllowed(false);
         }
-        // Asegurar que la celda sea visible
+        
         Rectangle rect = table.getCellRect(rowIndex, colIndex >= 0 ? colIndex : 0, true);
         table.scrollRectToVisible(rect);
     }

@@ -34,15 +34,7 @@ public class BusquedaBinaria {
         return resultados;
     }
 
-    /**
-     * Busca todos los predios cuya columna contenga el texto como substring.
-     * Primero busca la primera posicion >= termino y expande.
-     *
-     * @param predios lista ordenada de predios.
-     * @param columna columna en la cual buscar.
-     * @param termino termino parcial.
-     * @return lista de coincidencias parciales.
-     */
+
     public static List<Predio> buscarParcial(ArrayList<Predio> predios, String columna, String termino) {
         List<Predio> resultados = new ArrayList<>();
         if (predios == null || predios.isEmpty() || termino == null || termino.trim().isEmpty()) {
@@ -60,14 +52,7 @@ public class BusquedaBinaria {
         return resultados;
     }
 
-    /**
-     * Busqueda binaria estandar para exacto.
-     *
-     * @param predios lista ordenada.
-     * @param columna columna a buscar.
-     * @param termino termino exacto (ya normalizado).
-     * @return indice del termino o -1 si no existe.
-     */
+    
     private static int busquedaBinariaExacta(List<Predio> predios, String columna, String termino) {
         int izquierda = 0;
         int derecha = predios.size() - 1;
@@ -89,9 +74,7 @@ public class BusquedaBinaria {
         return -1;
     }
 
-    /**
-     * Retorna el primer indice con valor >= termino.
-     */
+
     private static int busquedaBinariaLowerBound(List<Predio> predios, String columna, String termino) {
         int izquierda = 0;
         int derecha = predios.size() - 1;

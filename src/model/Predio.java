@@ -32,7 +32,6 @@ public class Predio {
         }
     }
 
-    @Override
     public String toString() {
         return npn + "," + municipio + "," + direccion + "," + numeroFicha;
     }
