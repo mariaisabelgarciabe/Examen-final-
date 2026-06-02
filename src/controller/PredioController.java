@@ -8,11 +8,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class PredioController {
     private final PredioView vista;
     private List<Predio> predios;
     private final List<Predio> prediosOriginales;
     private Predio ultimaBusqueda;
+
+    private Timer tiempoTimer;
+    private long tiempoStart;
 
     private static final String RUTA_AUTO_CARGA = "C:/Users/Isabel/Downloads/predios.csv";
 
@@ -28,6 +32,7 @@ public class PredioController {
             vista.getLblEstado().setText("Estado: Cargado desde predios.csv inicial");
             actualizarTabla(predios);
             vista.getLblCantidad().setText("Registros: " + predios.size());
+            vista.setResaltarResultado(false);
         }
     }
 
@@ -48,27 +53,48 @@ public class PredioController {
                 vista.getLblEstado().setText("Estado: CSV cargado");
                 actualizarTabla(predios);
                 vista.getLblCantidad().setText("Registros: " + predios.size());
+                vista.setResaltarResultado(false);
             }
         }
     }
 
+    
+    private void iniciarTemporizador() {
+        tiempoStart = System.nanoTime();
+        if (tiempoTimer != null && tiempoTimer.isRunning()) {
+            tiempoTimer.stop();
+        }
+        tiempoTimer = new Timer(50, e -> {
+            long ahora = System.nanoTime();
+            double elapsedMs = (ahora - tiempoStart) / 1_000_000.0;
+            vista.getLblTiempo().setText(String.format("Tiempo: %.3f ms", elapsedMs));
+        });
+        tiempoTimer.setRepeats(true);
+        tiempoTimer.start();
+    }
+
+    
+    private void detenerTemporizador(double tiempoFinalMs) {
+        if (tiempoTimer != null) {
+            tiempoTimer.stop();
+        }
+        vista.getLblTiempo().setText(String.format("Tiempo: %.3f ms", tiempoFinalMs));
+    }
+
     private boolean cargarCSV(String ruta) {
         SwingWorker<List<Predio>, Void> worker = new SwingWorker<>() {
-            private long startTime;
+            private double tiempoMs;
 
-            @Override
+            
             protected List<Predio> doInBackground() throws Exception {
-                startTime = System.nanoTime();
+                long startTime = System.nanoTime();
                 List<Predio> result = CsvReader.leerCsv(ruta);
                 long endTime = System.nanoTime();
-                double tiempoMs = (endTime - startTime) / 1_000_000.0;
-                this.tiempoMs = tiempoMs;
+                tiempoMs = (endTime - startTime) / 1_000_000.0;
                 return result;
             }
 
-            private double tiempoMs;
-
-            @Override
+            
             protected void done() {
                 try {
                     predios = new ArrayList<>(get());
@@ -77,20 +103,24 @@ public class PredioController {
                     actualizarTabla(predios);
                     vista.getLblCantidad().setText("Registros: " + predios.size());
                     vista.getLblEstado().setText("Estado: CSV cargado");
-                    vista.getLblTiempo().setText(String.format("Tiempo: %.3f ms", tiempoMs));
+                    detenerTemporizador(tiempoMs);
+                    vista.setResaltarResultado(false);
                 } catch (Exception ex) {
                     vista.mostrarMensaje("Error cargando CSV: " + ex.getMessage(), true);
-                    vista.getLblTiempo().setText("Tiempo: Error");
+                    detenerTemporizador(0);
+                    vista.setResaltarResultado(false);
                 }
             }
         };
         vista.getLblTiempo().setText("Tiempo: Calculando...");
+        iniciarTemporizador();
         try {
             worker.execute();
             return true;
         } catch (Exception ex) {
             vista.mostrarMensaje("Error iniciando carga: " + ex.getMessage(), true);
-            vista.getLblTiempo().setText("Tiempo: Error");
+            detenerTemporizador(0);
+            vista.setResaltarResultado(false);
             return false;
         }
     }
@@ -123,6 +153,7 @@ public class PredioController {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             private double tiempoMs;
 
+            
             protected Void doInBackground() throws Exception {
                 long inicio = System.nanoTime();
 
@@ -138,15 +169,17 @@ public class PredioController {
                 return null;
             }
 
+            
             protected void done() {
                 actualizarTabla(predios);
                 vista.getLblCantidad().setText("Registros: " + predios.size());
                 vista.getLblEstado().setText("Estado: Ordenado por " + columnaFinal);
-                vista.getLblTiempo()
-                        .setText(String.format("Tiempo: %.3f ms (%s - %s)", tiempoMs, algoritmoFinal, columnaFinal));
+                detenerTemporizador(tiempoMs);
+                vista.setResaltarResultado(false);
             }
         };
         vista.getLblTiempo().setText("Tiempo: Calculando...");
+        iniciarTemporizador();
         worker.execute();
     }
 
@@ -175,7 +208,7 @@ public class PredioController {
             private double tiempoBusquedaMs;
             private double totalMs;
 
-        
+            
             protected List<Predio> doInBackground() throws Exception {
                 List<Predio> datos = new ArrayList<>();
                 datos.addAll(prediosOriginales);
@@ -203,7 +236,7 @@ public class PredioController {
                 return resultados;
             }
 
-    
+            
             protected void done() {
                 try {
                     List<Predio> resultados = get();
@@ -211,6 +244,7 @@ public class PredioController {
                     if (resultados.isEmpty()) {
                         vista.mostrarMensaje("No se encontraron coincidencias para: " + terminoFinal, true);
                         vista.getLblEstado().setText("Estado: Sin resultados");
+                        vista.setResaltarResultado(false);
                     } else {
                         actualizarTabla(resultados);
                         vista.getLblCantidad().setText("Registros encontrados: " + resultados.size());
@@ -220,19 +254,20 @@ public class PredioController {
                         if (colIndex >= 0) {
                             vista.seleccionarFilaConColumna(0, colIndex);
                         }
+                        vista.setResaltarResultado(true);
                     }
-                    vista.getLblTiempo().setText(String.format(
-                            "Tiempo: %.3f ms (Sort: %.3f ms + Busqueda: %.3f ms)",
-                            totalMs, tiempoSortMs, tiempoBusquedaMs));
+                    detenerTemporizador(totalMs);
                 } catch (Exception ex) {
                     vista.mostrarMensaje("Error en la busqueda: " + ex.getMessage(), true);
                     vista.getLblEstado().setText("Estado: Error");
-                    vista.getLblTiempo().setText("Tiempo: Error");
+                    detenerTemporizador(0);
+                    vista.setResaltarResultado(false);
                 }
             }
         };
         vista.getLblEstado().setText("Estado: Ordenando y buscando...");
         vista.getLblTiempo().setText("Tiempo: Calculando...");
+        iniciarTemporizador();
         worker.execute();
     }
 
@@ -245,6 +280,7 @@ public class PredioController {
         vista.getLblCantidad().setText("Registros: " + predios.size());
         vista.getLblEstado().setText("Estado: Limpio");
         vista.getTxtBuscar().setText("");
+        vista.setResaltarResultado(false);
     }
 
     private void actualizarTabla(final List<Predio> lista) {

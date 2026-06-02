@@ -9,24 +9,27 @@ public class BusquedaBinaria {
     
     public static List<Predio> buscar(ArrayList<Predio> predios, String columna, String termino) {
         List<Predio> resultados = new ArrayList<>();
-        if (predios == null || predios.isEmpty() || termino == null || termino.trim().isEmpty()) {
+        if (predios == null || predios.isEmpty() || termino == null) {
             return resultados;
         }
 
-        String normTerm = termino.trim().toUpperCase();
+        String normTerm = TextUtil.normalizarTexto(termino);
+        if (normTerm.isEmpty()) {
+            return resultados;
+        }
+
         int indice = busquedaBinariaExacta(predios, columna, normTerm);
         if (indice == -1) {
             return resultados;
         }
 
         int i = indice;
-
-        while (i >= 0 && predios.get(i).getValorColumna(columna).trim().toUpperCase().equals(normTerm)) {
+        while (i >= 0 && TextUtil.normalizarTexto(predios.get(i).getValorColumna(columna)).equals(normTerm)) {
             i--;
         }
         i++;
 
-        while (i < predios.size() && predios.get(i).getValorColumna(columna).trim().toUpperCase().equals(normTerm)) {
+        while (i < predios.size() && TextUtil.normalizarTexto(predios.get(i).getValorColumna(columna)).equals(normTerm)) {
             resultados.add(predios.get(i));
             i++;
         }
@@ -34,17 +37,24 @@ public class BusquedaBinaria {
         return resultados;
     }
 
-
+    
     public static List<Predio> buscarParcial(ArrayList<Predio> predios, String columna, String termino) {
         List<Predio> resultados = new ArrayList<>();
-        if (predios == null || predios.isEmpty() || termino == null || termino.trim().isEmpty()) {
+        if (predios == null || predios.isEmpty() || termino == null) {
             return resultados;
         }
-        String normTerm = termino.trim().toUpperCase();
+
+        String normTerm = TextUtil.normalizarTexto(termino);
+        if (normTerm.isEmpty()) {
+            return resultados;
+        }
+
         for (Predio p : predios) {
             String valor = p.getValorColumna(columna);
-            if (valor == null) continue;
-            String normValor = valor.trim().toUpperCase();
+            if (valor == null) {
+                continue;
+            }
+            String normValor = TextUtil.normalizarTexto(valor);
             if (normValor.contains(normTerm)) {
                 resultados.add(p);
             }
@@ -60,7 +70,7 @@ public class BusquedaBinaria {
         while (izquierda <= derecha) {
             int medio = izquierda + (derecha - izquierda) / 2;
             String valorMedio = predios.get(medio).getValorColumna(columna);
-            String normValor = valorMedio == null ? "" : valorMedio.trim().toUpperCase();
+            String normValor = TextUtil.normalizarTexto(valorMedio);
             int cmp = normValor.compareTo(termino);
 
             if (cmp == 0) {
@@ -74,7 +84,7 @@ public class BusquedaBinaria {
         return -1;
     }
 
-
+    
     private static int busquedaBinariaLowerBound(List<Predio> predios, String columna, String termino) {
         int izquierda = 0;
         int derecha = predios.size() - 1;
@@ -83,7 +93,7 @@ public class BusquedaBinaria {
         while (izquierda <= derecha) {
             int medio = izquierda + (derecha - izquierda) / 2;
             String valorMedio = predios.get(medio).getValorColumna(columna);
-            String normValor = valorMedio == null ? "" : valorMedio.trim().toUpperCase();
+            String normValor = TextUtil.normalizarTexto(valorMedio);
 
             if (normValor.compareTo(termino) >= 0) {
                 resultado = medio;

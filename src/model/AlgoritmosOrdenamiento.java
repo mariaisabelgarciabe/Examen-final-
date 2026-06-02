@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import model.TextUtil;
 
 public class AlgoritmosOrdenamiento {
 
@@ -89,8 +90,8 @@ public class AlgoritmosOrdenamiento {
     }
 
     private static int comparar(String a, String b) {
-        if (a == null) a = "";
-        if (b == null) b = "";
-        return a.trim().toUpperCase().compareTo(b.trim().toUpperCase());
+        String na = TextUtil.normalizarTexto(a);
+        String nb = TextUtil.normalizarTexto(b);
+        return na.compareTo(nb);
     }
 }

@@ -1,6 +1,7 @@
 package view;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.File;
@@ -23,7 +24,8 @@ public class PredioView extends JFrame {
 
     private final String[] columnas = {"NPN", "Municipio", "Direccion", "NumeroFicha"};
 
-    
+    private boolean resaltarResultado = false;
+
     public PredioView() {
         setTitle("Sistema Catastral - Antioquia");
         setSize(1000, 600);
@@ -32,7 +34,6 @@ public class PredioView extends JFrame {
         inicializarComponentes();
     }
 
-    
     private void inicializarComponentes() {
         setLayout(new BorderLayout());
 
@@ -45,7 +46,6 @@ public class PredioView extends JFrame {
         txtBuscar.setFont(new Font("SansSerif", Font.PLAIN, 16));
         panelSuperior.add(txtBuscar);
 
-        panelSuperior.add(new JLabel("Columna:"));
         JLabel lblColumna = new JLabel("Columna:");
         lblColumna.setFont(new Font("SansSerif", Font.PLAIN, 16));
         panelSuperior.add(lblColumna);
@@ -54,7 +54,6 @@ public class PredioView extends JFrame {
         cbColumna.setFont(new Font("SansSerif", Font.PLAIN, 16));
         panelSuperior.add(cbColumna);
 
-        panelSuperior.add(new JLabel("Algoritmo:"));
         JLabel lblAlgoritmo = new JLabel("Algoritmo:");
         lblAlgoritmo.setFont(new Font("SansSerif", Font.PLAIN, 16));
         panelSuperior.add(lblAlgoritmo);
@@ -81,7 +80,7 @@ public class PredioView extends JFrame {
         add(panelSuperior, BorderLayout.NORTH);
 
         tableModel = new DefaultTableModel(columnas, 0) {
-            @Override
+            
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
@@ -97,10 +96,27 @@ public class PredioView extends JFrame {
         table.getColumnModel().getColumn(2).setPreferredWidth(400); // Direccion
         table.getColumnModel().getColumn(3).setPreferredWidth(200); // NumeroFicha
 
+
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus,
+                                                           int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (resaltarResultado) {
+                    
+                    c.setBackground(new Color(173, 216, 230)); // light blue
+                } else {
+                    // Fondo por defecto (dependiendo de selección)
+                    c.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+                }
+                return c;
+            }
+        });
+
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
-        
         JPanel panelInferior = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
         lblTiempo = new JLabel("Tiempo: N/A");
         lblTiempo.setFont(new Font("SansSerif", Font.PLAIN, 16));
@@ -181,11 +197,18 @@ public class PredioView extends JFrame {
         if (colIndex >= 0 && colIndex < table.getColumnCount()) {
             table.setColumnSelectionInterval(colIndex, colIndex);
         } else {
-            
             table.setColumnSelectionAllowed(false);
         }
-        
+
         Rectangle rect = table.getCellRect(rowIndex, colIndex >= 0 ? colIndex : 0, true);
         table.scrollRectToVisible(rect);
+    }
+
+    
+    public void setResaltarResultado(boolean activar) {
+        this.resaltarResultado = activar;
+        if (table != null) {
+            table.repaint();
+        }
     }
 }
