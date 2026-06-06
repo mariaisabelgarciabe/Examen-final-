@@ -23,7 +23,14 @@ public class Predio {
     public void setNumeroFicha(String numeroFicha) { this.numeroFicha = numeroFicha; }
 
     public String getValorColumna(String columna) {
-        switch (columna.toLowerCase()) {
+        if (columna == null) {
+            return "";
+        }
+    
+        String normalizedColumna = columna.trim().toLowerCase();
+        normalizedColumna = TextUtil.normalizarTexto(normalizedColumna).replaceAll("\\s+", "");
+        
+        switch (normalizedColumna) {
             case "npn": return npn == null ? "" : npn;
             case "municipio": return municipio == null ? "" : municipio;
             case "direccion": return direccion == null ? "" : direccion;

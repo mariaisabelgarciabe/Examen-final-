@@ -208,7 +208,6 @@ public class PredioController {
             private double tiempoBusquedaMs;
             private double totalMs;
 
-            
             protected List<Predio> doInBackground() throws Exception {
                 List<Predio> datos = new ArrayList<>();
                 datos.addAll(prediosOriginales);
@@ -235,7 +234,6 @@ public class PredioController {
 
                 return resultados;
             }
-
             
             protected void done() {
                 try {
